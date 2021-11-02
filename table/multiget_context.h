@@ -95,7 +95,7 @@ class MultiGetContext {
   // there is negligible benefit for batches exceeding this. Keeping this < 32
   // simplifies iteration, as well as reduces the amount of stack allocations
   // that need to be performed
-  static const int MAX_BATCH_SIZE = 32;
+  static const int MAX_BATCH_SIZE = 60;
 
   MultiGetContext(autovector<KeyContext*, MAX_BATCH_SIZE>* sorted_keys,
                   size_t begin, size_t num_keys, SequenceNumber snapshot,

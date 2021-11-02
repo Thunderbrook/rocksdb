@@ -45,7 +45,7 @@
 #include <deque>
 #include <set>
 #include <vector>
-
+#include <ctime>
 #include "env/composite_env_wrapper.h"
 #include "env/io_posix.h"
 #include "logging/posix_logger.h"
@@ -260,6 +260,10 @@ class PosixFileSystem : public FileSystem {
 #if defined(ROCKSDB_IOURING_PRESENT)
           ,
           thread_local_io_urings_.get()
+#endif
+#if defined(ROCKSDB_LIBAIO_PRESENT)
+          ,
+          thread_local_io_context_.get()
 #endif
               ));
     }
@@ -997,6 +1001,10 @@ class PosixFileSystem : public FileSystem {
   // io_uring instance
   std::unique_ptr<ThreadLocalPtr> thread_local_io_urings_;
 #endif
+#if defined(ROCKSDB_LIBAIO_PRESENT)
+  // io_context_t instance
+  std::unique_ptr<ThreadLocalPtr> thread_local_io_context_;
+#endif
 
   size_t page_size_;
 
@@ -1059,6 +1067,10 @@ PosixFileSystem::PosixFileSystem()
     thread_local_io_urings_.reset(new ThreadLocalPtr(DeleteIOUring));
     delete new_io_uring;
   }
+#endif
+#if defined(ROCKSDB_LIBAIO_PRESENT)
+  // std::srand(std::time(nullptr));
+  thread_local_io_context_.reset(new ThreadLocalPtr(DeleteIOContext));
 #endif
 }
 
